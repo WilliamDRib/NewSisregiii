@@ -13,8 +13,8 @@ from webdriver_manager.chrome import ChromeDriverManager
 import re
 import pandas as pd
 import time
-import csv
 import pywhatkit
+import random
 from datetime import datetime,timedelta
 
 #Import das funções do DB
@@ -147,15 +147,15 @@ while(1):
 for index, row in df.iterrows():
 
     # Anonimizando os dados
-    nome, cns, numero = anonimizar(row['NAME'],row['CNS'],row['NUMBER'])
+    codigo, nome, cns, numero = anonimizar()
+
+    numero_valido = True
 
     if row['NUMBER']:
         numero_valido = False
-    else:
-        numero_valido = True
 
     # Salvando no DB
-    print(db_create(cursor, conexao, nome, cns, numero, True, numero_valido, row['COLETA_TEMPO'], row['DATA_COLETA']))
+    print(db_create(cursor, conexao, codigo, nome, cns, numero, True, numero_valido, row['COLETA_TEMPO'], row['DATA_COLETA']))
 
 df = pd.DataFrame() #Limpa os valores salvos
 
@@ -163,7 +163,10 @@ df = pd.DataFrame() #Limpa os valores salvos
 
 from twilio.rest import Client as Client_Twilio
 
-twilio = Client_Twilio(os.getenv('TWILIO_ACCOUNT'),os.getenv('TWILIO_TOKEN'))
+twilio = Client_Twilio(
+    os.getenv('TWILIO_ACCOUNT'),
+    os.getenv('TWILIO_TOKEN')
+)
 
 # Lendo os dados do DB que precisam ser enviados
 result = db_read_send(cursor, conexao)
@@ -172,28 +175,45 @@ for row in result:
     try:
         start_time = time.time()
 
-        numero = '+'+str(row[3])
+        numero = '+'+str(row[4])
         mensagem = f'''
-            Olá paciente {row[1]}, voce teve seu procedimento liberado, por favor comparecer ao Setor Responsavel.        
+            Olá paciente {row[2]}, voce teve seu procedimento liberado, por favor comparecer ao Setor Responsavel.        
         '''
 
         # Enviar a mensagem via WhatsApp pelo Twilio
         message = twilio.messages.create(
-            from_='whatsapp:+14155238886',
-            to=f'whatsapp:{numero}',
-            body=mensagem
+            from_ = 'whatsapp:+14155238886',
+            to = f'whatsapp:{numero}',
+            body = mensagem
         )
+        
+        tentativas = 0
+        max_tentativas = 10
+        status = message.status
 
+        print(f'Tentativa de envio de mensagem, ID {row[0]}')
+
+        # Espera a mensagem ser enviada
+        while status not in ['delivered', 'undelivered', 'failed', 'read'] and tentativas < max_tentativas:
+            time.sleep(1) 
+            message = twilio.messages(message.sid).fetch()
+            status = message.status
+            tentativas += 1
+
+        # Verifica se a mensagem foi enviada
+        if status not in ['delivered', 'read']:
+            raise Exception(f"Mensagem não entregue. Status final: {status}")
+            
         tempo_para_enviar = time.time() - start_time
         date_now = datetime.now().strftime("%Y%m%d%H%M%S")
 
         # Registrando sobre o envio
-        db_update(cursor, conexao, 1, 0, tempo_para_enviar, None, row[0], date_now)
+        print(db_update(cursor, conexao, 1, 0, tempo_para_enviar, None, row[0], date_now))
         
     except Exception as e:
         # Se der erro no envio, registrar no status
         date_now = datetime.now().strftime("%Y%m%d%H%M%S")
-        db_update(cursor, conexao, 0, 1, 0, str(e), row[0], date_now)
+        print(db_update(cursor, conexao, 0, 1, 0, str(e), row[0], date_now))
         print(str(e))
 
 # ------------------- End -------------------
@@ -201,3 +221,5 @@ for row in result:
 driver.close()
 cursor.close()
 conexao.close()
+
+print("Fim!")

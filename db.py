@@ -18,19 +18,19 @@
 #     cursor = conexao.cursor()
 
 #Create
-def db_create(cursor, conexao, nome, cns, telefone, anonimo, telefone_valido,tempo_coleta,data_coleta):
+def db_create(cursor, conexao, codigo, nome, cns, telefone, anonimo, telefone_valido,tempo_coleta,data_coleta):
     try:
         query = '''
             INSERT INTO pacientes 
-            (nome, cns, telefone, anonimo, telefone_valido, tempo_coleta, data_coleta) 
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
+            (codigo, nome, cns, telefone, anonimo, telefone_valido, tempo_coleta, data_coleta) 
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
         '''
         # Executa a query com os valores
-        cursor.execute(query, (nome, cns, telefone, anonimo, telefone_valido, tempo_coleta, data_coleta))
+        cursor.execute(query, (codigo, nome, cns, telefone, anonimo, telefone_valido, tempo_coleta, data_coleta))
         conexao.commit()
         
         last_id = cursor.lastrowid
-        return f"Procedimento ID {last_id} Criado!"
+        return f"Procedimento ID {last_id} Criado no DB!"
     except Exception as e:
         return f"Erro: {str(e)}"
 
@@ -79,7 +79,7 @@ def db_update(cursor, conexao, enviado, erro_status, tempo_envio, erro, id, data
         '''
         cursor.execute(query, (enviado, erro_status, tempo_envio, erro, data_envio, id))
         conexao.commit()
-        return f"Procedimento ID ({id}) Alterado!"
+        return f"Procedimento ID ({id}) Alterado no DB!"
     except Exception as e:
         return f"Error = {str(e)}"
 

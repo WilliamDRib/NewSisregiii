@@ -3,6 +3,7 @@ use db_saude;
 
 create table pacientes (
 id int not null auto_increment,
+codigo int not null,
 nome varchar(50) not null,
 cns bigint not null,
 telefone bigint not null,
@@ -19,5 +20,6 @@ erro varchar(50),
 data_coleta datetime not NULL,
 data_envio datetime,
 
-primary key (id)
+primary key (id),
+UNIQUE (codigo)
 );
