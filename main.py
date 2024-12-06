@@ -13,7 +13,6 @@ from webdriver_manager.chrome import ChromeDriverManager
 import re
 import pandas as pd
 import time
-import pywhatkit
 import random
 from datetime import datetime,timedelta
 
@@ -99,10 +98,10 @@ except Exception as e:
 autorizacao.click()
 
 hoje = datetime.today()
-ontem = hoje - timedelta(days=2)
+ontem = hoje - timedelta(days=1)
 
-data = hoje.strftime('%d-%m-%Y')
-# data = ontem.strftime('%d-%m-%Y')
+# data = hoje.strftime('%d-%m-%Y')
+data = ontem.strftime('%d-%m-%Y')
 
 inicio_periodo.send_keys(data)
 final_periodo.send_keys(data)
