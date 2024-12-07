@@ -15,7 +15,7 @@ erro_status bool DEFAULT False,
 
 tempo_coleta double not null, 
 tempo_envio double,
-erro varchar(50),
+erro varchar(255),
 
 data_coleta datetime not NULL,
 data_envio datetime,
