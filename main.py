@@ -97,12 +97,11 @@ except Exception as e:
 # Preenche o formulario e busca
 autorizacao.click()
 
+# Salva a data do dia atual
 hoje = datetime.today()
-ontem = hoje - timedelta(days=1)
+data = hoje.strftime('%d-%m-%Y')
 
-# data = hoje.strftime('%d-%m-%Y')
-data = ontem.strftime('%d-%m-%Y')
-
+# Preenche o formulário com a data atual
 inicio_periodo.send_keys(data)
 final_periodo.send_keys(data)
 pesquisar.click()
