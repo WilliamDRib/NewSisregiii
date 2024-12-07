@@ -67,6 +67,7 @@ Configurar o config.env da seguinte forma:
 - PASS_DB: Senha para comunicar com o BD
 - TWILIO_ACCOUNT: Codigo SID da conta do Twilio
 - TWILIO_TOKEN: Token de autenticação do Twilio
+- NUMBER_ANONIMO: Telefone para envio de teste na anonimização (Deixar vazio caso não deseje anonimizar os dados)
 
 ### Executando
 
