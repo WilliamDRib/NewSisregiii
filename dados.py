@@ -24,7 +24,7 @@ def loading_table(driver):
         driver.quit()
 
 # Função que ajusta o telefone
-def validar_telefone(telefone):
+def ajustar_telefone(telefone):
     # 1. Remover caracteres indesejados
     telefone_limpo = re.sub(r'[^\d]', '', telefone)  # Remove tudo que não for dígito
     
@@ -78,7 +78,7 @@ def collect_data(driver):
             # Valida o telefone
             if extract_number:
                 telefone_bruto = re.sub(r'[-.\s]', '', extract_number[0])
-                table_dict['NUMBER'] = validar_telefone(telefone_bruto)
+                table_dict['NUMBER'] = ajustar_telefone(telefone_bruto)
             else:
                 table_dict['NUMBER'] = ""
             
@@ -103,8 +103,8 @@ def collect_data(driver):
             return templist
 
 # Função para anonimizar os dados
-def anonimizar():
+def anonimizar(telefone):
     codigo = random.randint(100000000, 999999999)
 
     # Numero fixado devido a API de envio
-    return codigo, "NOME SOBRENOME", 123456789012345, 554998238854
+    return codigo, "NOME SOBRENOME", 123456789012345, telefone

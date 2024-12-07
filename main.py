@@ -152,8 +152,12 @@ for index, row in df.iterrows():
     if row['NUMBER']:
         numero_valido = False
 
-    # Salvando no DB
-    print(db_create(cursor, conexao, codigo, nome, cns, numero, True, numero_valido, row['COLETA_TEMPO'], row['DATA_COLETA']))
+    # Salvando no DB (Verifica se vai ser salvo anonimo ou os dados)
+    if os.getenv('NUMBER_ANONIMO') in (None, ""):
+        print(db_create(cursor, conexao, row['CODIGO'], row['NAME'], row['CNS'], row['NUMBER'], True, numero_valido, row['COLETA_TEMPO'], row['DATA_COLETA']))
+    else:
+        print(db_create(cursor, conexao, codigo, nome, cns, numero, True, numero_valido, row['COLETA_TEMPO'], row['DATA_COLETA']))
+
 
 df = pd.DataFrame() #Limpa os valores salvos
 
