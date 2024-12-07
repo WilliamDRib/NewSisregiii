@@ -144,11 +144,7 @@ while(1):
 # Iterando o Dataframe
 for index, row in df.iterrows():
 
-    # Anonimizando os dados
-    codigo, nome, cns, numero = anonimizar()
-
     numero_valido = True
-
     if row['NUMBER']:
         numero_valido = False
 
@@ -156,8 +152,9 @@ for index, row in df.iterrows():
     if os.getenv('NUMBER_ANONIMO') in (None, ""):
         print(db_create(cursor, conexao, row['CODIGO'], row['NAME'], row['CNS'], row['NUMBER'], True, numero_valido, row['COLETA_TEMPO'], row['DATA_COLETA']))
     else:
+        # Anonimizando os dados
+        codigo, nome, cns, numero = anonimizar()
         print(db_create(cursor, conexao, codigo, nome, cns, numero, True, numero_valido, row['COLETA_TEMPO'], row['DATA_COLETA']))
-
 
 df = pd.DataFrame() #Limpa os valores salvos
 
