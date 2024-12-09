@@ -45,7 +45,7 @@ else:
 
 #Configurando o WebDriver
 chrome_options = webdriver.ChromeOptions()
-chrome_options.add_argument('--headless')
+# chrome_options.add_argument('--headless')
 service = Service(ChromeDriverManager().install())
 driver = webdriver.Chrome(service = service, options=chrome_options)
 
@@ -104,7 +104,7 @@ data = hoje.strftime('%d-%m-%Y')
 # Preenche o formulário com a data atual
 inicio_periodo.send_keys(data)
 final_periodo.send_keys(data)
-pesquisar.click()
+# pesquisar.click()
 
 print("Fomulario preenchido")
 
@@ -144,16 +144,16 @@ while(1):
 # Iterando o Dataframe
 for index, row in df.iterrows():
 
-    numero_valido = True
+    numero_valido = False
     if row['NUMBER']:
-        numero_valido = False
+        numero_valido = True
 
     # Salvando no DB (Verifica se vai ser salvo anonimo ou os dados)
     if os.getenv('NUMBER_ANONIMO') in (None, ""):
         print(db_create(cursor, conexao, row['CODIGO'], row['NAME'], row['CNS'], row['NUMBER'], True, numero_valido, row['COLETA_TEMPO'], row['DATA_COLETA']))
     else:
         # Anonimizando os dados
-        codigo, nome, cns, numero = anonimizar()
+        codigo, nome, cns, numero = anonimizar(os.getenv('NUMBER_ANONIMO'))
         print(db_create(cursor, conexao, codigo, nome, cns, numero, True, numero_valido, row['COLETA_TEMPO'], row['DATA_COLETA']))
 
 df = pd.DataFrame() #Limpa os valores salvos
@@ -167,6 +167,8 @@ twilio = Client_Twilio(
     os.getenv('TWILIO_TOKEN')
 )
 
+twilio_number = 'whatsapp:'+str(os.getenv('TWILIO_NUMBER'))
+
 # Lendo os dados do DB que precisam ser enviados
 result = db_read_send(cursor, conexao)
 
@@ -174,15 +176,15 @@ for row in result:
     try:
         start_time = time.time()
 
-        numero = '+'+str(row[4])
+        numero = 'whatsapp:+'+str(row[4])
         mensagem = f'''
             Olá paciente {row[2]}, voce teve seu procedimento liberado, por favor comparecer ao Setor Responsavel.        
         '''
 
         # Enviar a mensagem via WhatsApp pelo Twilio
         message = twilio.messages.create(
-            from_ = 'whatsapp:+14155238886',
-            to = f'whatsapp:{numero}',
+            from_ = twilio_number,
+            to = numero,
             body = mensagem
         )
         
