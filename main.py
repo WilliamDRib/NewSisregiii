@@ -45,7 +45,7 @@ else:
 
 #Configurando o WebDriver
 chrome_options = webdriver.ChromeOptions()
-# chrome_options.add_argument('--headless')
+chrome_options.add_argument('--headless')
 service = Service(ChromeDriverManager().install())
 driver = webdriver.Chrome(service = service, options=chrome_options)
 
